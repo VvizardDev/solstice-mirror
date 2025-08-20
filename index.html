@@ -3,37 +3,90 @@
 <head>
   <title>Solstice Mirror Date</title>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-    h1 { font-size: 2em; }
-    p { font-size: 1.2em; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background: linear-gradient(to bottom, #f0f8ff, #e6e6fa);
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    p, label, select, input, button {
+      font-size: 1.2em;
+      margin: 10px;
+    }
+    #customOutput, #output {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .section {
+      margin-top: 30px;
+      padding: 15px;
+      border-top: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
-  <h1>Solstice Mirror Date</h1>
+  <h1>🌞 Solstice Mirror Date Calculator</h1>
   <p id="output"></p>
 
-  <script>
-    function getMirrorDate() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const solstice = new Date(`${year}-06-21`);
-      
-      const msPerDay = 1000 * 60 * 60 * 24;
-      const daysSinceSolstice = Math.floor((now - solstice) / msPerDay);
-      const mirrorDate = new Date(solstice - daysSinceSolstice * msPerDay);
+  <div class="section">
+    <label for="solsticeType">Choose solstice:</label>
+    <select id="solsticeType">
+      <option value="summer">Summer Solstice (June 21)</option>
+      <option value="winter">Winter Solstice (Dec 21)</option>
+    </select>
+    <br>
 
-      return {
-        today: now.toDateString(),
-        mirror: mirrorDate.toDateString(),
-        offset: daysSinceSolstice
-      };
+    <label for="customDate">Choose a date to mirror:</label>
+    <input type="date" id="customDate">
+    <button onclick="calculateCustomMirror()">Find Mirror Date</button>
+
+    <p id="customOutput"></p>
+  </div>
+
+  <script>
+    function getSolsticeDate(year, type) {
+      return new Date(`${year}-${type === 'summer' ? '06-21' : '12-21'}`);
     }
 
-    const result = getMirrorDate();
-    document.getElementById("output").innerHTML =
-      `Today is <strong>${result.today}</strong><br>` +
-      `It is <strong>${result.offset}</strong> days since the summer solstice.<br>` +
-      `Your mirror date is <strong>${result.mirror}</strong>`;
+    function getMirrorDate(date, solsticeType) {
+      const year = date.getFullYear();
+      const solstice = getSolsticeDate(year, solsticeType);
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const daysOffset = Math.floor((date - solstice) / msPerDay);
+      const mirrorDate = new Date(solstice - daysOffset * msPerDay);
+      return { mirrorDate, daysOffset, solstice };
+    }
+
+    function displayTodayMirror() {
+      const today = new Date();
+      const solsticeType = document.getElementById("solsticeType").value;
+      const { mirrorDate, daysOffset, solstice } = getMirrorDate(today, solsticeType);
+      document.getElementById("output").innerHTML =
+        `Today is <strong>${today.toDateString()}</strong><br>` +
+        `Using <strong>${solstice.toDateString()}</strong> as the ${solsticeType} solstice.<br>` +
+        `It is <strong>${daysOffset}</strong> days from the solstice.<br>` +
+        `Mirror date: <strong>${mirrorDate.toDateString()}</strong>`;
+    }
+
+    function calculateCustomMirror() {
+      const input = document.getElementById("customDate").value;
+      const solsticeType = document.getElementById("solsticeType").value;
+      if (!input) return;
+      const selectedDate = new Date(input);
+      const { mirrorDate, daysOffset, solstice } = getMirrorDate(selectedDate, solsticeType);
+      document.getElementById("customOutput").innerHTML =
+        `Selected date: <strong>${selectedDate.toDateString()}</strong><br>` +
+        `Using <strong>${solstice.toDateString()}</strong> as the ${solsticeType} solstice.<br>` +
+        `It is <strong>${daysOffset}</strong> days from the solstice.<br>` +
+        `Mirror date: <strong>${mirrorDate.toDateString()}</strong>`;
+    }
+
+    document.getElementById("solsticeType").addEventListener("change", displayTodayMirror);
+    displayTodayMirror();
   </script>
 </body>
 </html>

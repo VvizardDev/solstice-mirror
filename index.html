@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Solstice Mirror Date</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    h1 { font-size: 2em; }
+    p { font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Solstice Mirror Date</h1>
+  <p id="output"></p>
+
+  <script>
+    function getMirrorDate() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const solstice = new Date(`${year}-06-21`);
+      
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const daysSinceSolstice = Math.floor((now - solstice) / msPerDay);
+      const mirrorDate = new Date(solstice - daysSinceSolstice * msPerDay);
+
+      return {
+        today: now.toDateString(),
+        mirror: mirrorDate.toDateString(),
+        offset: daysSinceSolstice
+      };
+    }
+
+    const result = getMirrorDate();
+    document.getElementById("output").innerHTML =
+      `Today is <strong>${result.today}</strong><br>` +
+      `It is <strong>${result.offset}</strong> days since the summer solstice.<br>` +
+      `Your mirror date is <strong>${result.mirror}</strong>`;
+  </script>
+</body>
+</html>
